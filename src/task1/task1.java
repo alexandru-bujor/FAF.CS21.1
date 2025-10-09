@@ -28,12 +28,12 @@ public class task1 {
             case 1 -> {
                 System.out.print("Introdu textul care trebuie criptat: ");
                 String ch = sc.nextLine();
-                Encrypt.encrypt(ch, key);
+                Encrypt.encrypt(ch, key, alphabet.ABC);
             }
             case 2 -> {
                 System.out.print("Introdu textul care trebuie decriptat: ");
                 String ch = sc.nextLine();
-                Decrypt.decrypt(ch, key);
+                Decrypt.decrypt(ch, key, alphabet.ABC);
             }
             default -> {
                 System.out.println("Ați introdus o opțiune greșită!");
