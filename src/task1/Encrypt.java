@@ -2,11 +2,9 @@ package task1;
 
 public class Encrypt {
 
-    static char[] ABC = {'A','B','C','D','E','F','G', 'H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
 
-    static void encrypt(String ch, int k){
+    public static void encrypt(String ch, int k, char[] ABC){
         String a = "";
-        int l = ABC.length;
         ch = ch.toUpperCase();
         for (int j = 0; j < ch.length(); j++) {
             char chNow = ch.charAt(j);

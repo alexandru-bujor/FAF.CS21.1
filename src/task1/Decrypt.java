@@ -2,9 +2,7 @@ package task1;
 
 public class Decrypt {
 
-    static char[] ABC = {'A','B','C','D','E','F','G', 'H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'};
-
-    static void decrypt(String ch, int k){
+    public static void decrypt(String ch, int k, char[] ABC){
         String a = "";
         ch = ch.toUpperCase();
         for (int j = 0; j < ch.length(); j++) {
