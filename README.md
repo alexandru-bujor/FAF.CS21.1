@@ -1,7 +1,5 @@
 # Lucrare de laborator 1 — Cifrul lui Cezar (Java)
 
-> Proiect Java pentru implementarea **Cezar** (Task 1) și **Cezar + permutare** (Task 2), fără a expune soluția în README. Acest fișier descrie arhitectura, regulile de intrare/ieșire, modul de rulare și testare.
-
 ---
 
 ## Obiective
@@ -30,7 +28,6 @@ Cryptografie_Securitate/
 ├─ README.md               # Acest fișier
 └─ .gitignore
 ```
-> Notă: denumirile exacte ale fișierelor pot diferi; păstrați pachetele `task1` și `task2`.
 
 ---
 
@@ -48,7 +45,6 @@ javac -d out -sourcepath src src/Main.java src/task1/*.java src/task2/*.java
 # Rulare (folosește numele pachetului dacă există)
 java -cp out Main
 ```
-> Dacă clasele au pachete (`package task1;` etc.), asigurați-vă că folosiți calea și numele complet al clasei la rulare (ex: `java -cp out task1.task1`).
 
 ---
 
@@ -60,7 +56,7 @@ java -cp out Main
 
 ---
 
-## Descriere la nivel înalt (fără cod)
+## Descriere 
 ### Task 1 — Cezar simplu
 - Criptare: `c = (x + k) mod 26`
 - Decriptare: `m = (y - k + 26) mod 26`
@@ -74,63 +70,58 @@ java -cp out Main
 
 ---
 
-## Testare recomandată
-- **Valori limită pentru `k`**: 1 și 25; cazuri invalide: 0, 26, negative, non-numeric.
-- **Validare `k2`**: prea scurt, conține non-litere, conține duplicate → alfabetul final nu are duplicate și are 26 litere.
-- **Round-trip**:
-    - `Decrypt(Encrypt(M, k), k) == Normalize(M)`
-    - `Decrypt(Encrypt(M, k, k2), k, k2) == Normalize(M)`
-- **Normalizare**: texte cu litere mici, spații, newline.
-- **Robustețe**: mesaje cu litere la capete ale alfabetului (X, Y, Z) pentru a verifica „wrap-around”.
 
-Puteți include fișiere în `tests/` (ex: `ex1.txt`, `ex2.txt`) și un script simplu de rulare.
 
----
-
-## Troubleshooting
-- **Nu pornește programul din `task1.task1`**: metoda `main` trebuie să fie `public static void main(String[] args)`. Dacă folosiți un „launcher” în `Main.java`, acesta trebuie să apeleze metodele potrivite.
-- **Clase duplicate**: evitați duplicarea fișierelor (ex: `Decrypt.java` de două ori). Mențineți câte **o** clasă per responsabilitate.
-- **Chei în afara domeniului**: validați `k` înainte de a continua; afișați mesaj și reporniți promptul.
-- **Caractere ignorate**: dacă apar caractere non-alfabetice, semnalați și cereți input valid.
-- **Wrap-around**: verificați calculele pentru cazurile `i + k >= 26` (encrypt) și `i - k < 0` (decrypt).
-
----
-
-## Interacțiune CLI (exemplu fără rezultat)
+## Rezultate
 ```
-Alege modul:
-1) Task 1 — Cezar
-2) Task 2 — Cezar + permutare
-> 2
+Selecteaza unul dintre urmatoarele taskuri:
 
-Cheie numerică (1–25): 3
-Cuvânt-cheie (doar litere, ≥ 7): CRYPTOGRAPHY
+1. Sarcina 1.1
+2. Sarcina 1.2
+1
+Introdu cheia pentru Cryptare/Decryptare: 3
 
-Operație:
-1) Criptare
-2) Decriptare
-> 1
-
-Mesaj: BRUTE FORCE ATTACK
-Rezultat: [generat de program]
+Algoritmul Cesar. Selectează una dintre opțiuni:
+1. Criptare
+2. Decriptare
+1
+Introdu textul care trebuie criptat: NEW
+QHZ
 ```
 
+```
+Selecteaza unul dintre urmatoarele taskuri:
+
+1. Sarcina 1.1
+2. Sarcina 1.2
+1
+Introdu cheia pentru Cryptare/Decryptare: 3
+
+Algoritmul Cesar. Selectează una dintre opțiuni:
+1. Criptare
+2. Decriptare
+2
+Introdu textul care trebuie decriptat: QHZ
+NEW
+
+```
+
+```
+Selecteaza unul dintre urmatoarele taskuri:
+
+1. Sarcina 1.1
+2. Sarcina 1.2
+2
+
+Criptarea algoritmului cesar utilizand doua chei.
+Introdu prima cheie: 3
+Introdu a doua cheie: TEST
+Textul care trebuie criptat: NEW
+QBZ
+```
+
 ---
 
-## Checklist înainte de predare
-- [ ] Validare completă pentru `k` și `k2` cu mesaje clare.
-- [ ] Normalizare text (UPPERCASE + fără spații) înainte de procesare.
-- [ ] Generarea alfabetului permutat **fără duplicate** (26 litere).
-- [ ] Round-trip tests: encrypt → decrypt revine la mesajul normalizat.
-- [ ] `README.md` explică **cum se rulează**, **ce fișiere există** și **ce teste s-au făcut**.
-- [ ] Nicio scurgere a cheilor în loguri/print-uri inutile.
-
----
-
-## Integritate academică
-Acest proiect este destinat uzului educațional. Implementarea trebuie să fie a autorului. Evitați copierea necreditată și documentați deciziile tehnice în `docs/`.
-
----
 
 ## Autor
 **Student:** Bujor Alexandru  
