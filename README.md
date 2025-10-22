@@ -2,85 +2,117 @@
 
 ---
 
-## Obiective
-- **Task 1**: Cifrul Cezar clasic cu cheie numerică `k ∈ [1..25]` pe alfabetul englez A–Z, cu mapare proprie (fără ASCII/Unicode).
-- **Task 2**: Cifrul Cezar aplicat peste un **alfabet permutat** generat dintr-un cuvânt-cheie `k2` (numai litere, lungime ≥ 7), urmat de restul literelor din alfabet fără duplicate.
-- Operații: **Encrypt** și **Decrypt** pentru ambele task-uri.
-- Normalizare intrare: **majuscule + eliminare spații** înainte de procesare.
-- Validare strictă: chei & text doar în domeniul permis; mesaje de eroare explicite.
+## Descriere detaliată a soluției
+
+### 1. Arhitectura generală
+
+Soluția este organizată modular, pe două pachete:
+- `task1` — implementează **cifrul Cezar clasic**, bazat pe deplasarea alfabetului.
+- `task2` — implementează **cifrul Cezar cu permutare**, adăugând o cheie secundară ce modifică ordinea alfabetului.
+
+Fiecare pachet conține clase specializate:
+- `alphabet` — definește alfabetul de bază `A–Z` ca un tablou `char[]`.
+- `Encrypt` și `Decrypt` — conțin logica efectivă pentru criptare/decriptare.
+- `task1` și `task2` — coordonează interacțiunea cu utilizatorul (citire chei, opțiune, text).
+- `newAlphabet` — generează alfabetul permutat din cuvântul-cheie introdus.
 
 ---
 
-## Structura proiectului (actuală)
+### 2. Logica algoritmului Cezar (Task 1)
+
+Algoritmul pornește de la alfabetul standard:
 ```
-Cryptografie_Securitate/
-├─ src/
-│  ├─ task1/
-│  │  ├─ alphabet.java     # Alfabetul de bază (A..Z) și maparea 0..25
-│  │  ├─ Encrypt.java      # Criptare Caesar simplu
-│  │  ├─ Decrypt.java      # Decriptare Caesar simplu
-│  │  └─ task1.java        # Flux CLI pentru Task 1
-│  ├─ task2/
-│  │  ├─ newAlphabet.java  # Generarea alfabetului permutat din k2
-│  │  ├─ encrypt2.java     # Criptare Caesar peste alfabetul permutat
-│  │  └─ task2.java        # Flux CLI pentru Task 2
-│  └─ Main.java            # Meniul principal (alegere Task 1 / Task 2)
-├─ README.md               # Acest fișier
-└─ .gitignore
+A B C D E F G H I J K L M N O P Q R S T U V W X Y Z
 ```
 
----
+#### Criptare:
+Pentru fiecare caracter `ch` din textul de intrare:
+1. Se transformă în majusculă.
+2. Se caută poziția sa `i` în vectorul `ABC`.
+3. Se deplasează spre dreapta cu valoarea cheii `k`:
+   ```
+   noua_poz = (i + k) mod 26
+   ```
+4. Se extrage litera de la poziția `noua_poz` și se concatenează în rezultatul criptat.
 
-## Rulare
-### 1) Din IntelliJ IDEA
-- Deschide proiectul → click dreapta pe `Main.java` → **Run 'Main'**.
-- Alternativ, rulați direct `task1.task1` sau `task2.task2` pentru a intra direct în fluxul fiecărui task.
+#### Decriptare:
+Procedura inversă:
+```
+noua_poz = (i - k + 26) mod 26
+```
+Se adaugă 26 pentru a evita indici negativi.
 
-### 2) Din linie de comandă (JDK 17+)
-În directorul proiectului:
-```bash
-# Compilare în folderul out/
-javac -d out -sourcepath src src/Main.java src/task1/*.java src/task2/*.java
-
-# Rulare (folosește numele pachetului dacă există)
-java -cp out Main
+Exemplu:
+```
+Text: NEW
+Cheie: 3
+Rezultat criptare: QHZ
+Rezultat decriptare: NEW
 ```
 
 ---
 
-## Reguli de intrare & validare
-- **Cheia numerică `k`**: întreg în **[1..25]**. Alte valori sunt respinse cu mesaj clar.
-- **Cuvânt-cheie `k2` (Task 2)**: **doar litere A–Z/a–z**, **fără spații**, **lungime ≥ 7**. Se elimină duplicatele în ordinea apariției.
-- **Mesaj/Criptogramă**: doar litere A–Z/a–z. Se va transforma la **MAJUSCULE** și se vor **elimina spațiile** înainte de procesare.
-- **Mapare alfabet**: se utilizează **tabloul propriu** de litere (A..Z) pentru indexare 0..25. **NU** se folosesc codificările ASCII/Unicode pentru calcule.
+### 3. Validare și normalizare
+
+Înainte de orice procesare:
+- Textul este convertit în majuscule (`toUpperCase()`).
+- Spațiile sunt eliminate.
+- Cheia `k` este verificată să fie între `1` și `25`.
+- Dacă intrarea nu respectă aceste reguli, programul afișează mesaje de eroare și solicită introducerea unei valori corecte.
+
+Această validare se face în `task1.java` prin intermediul clasei `Scanner`, care verifică tipul de date și repornește promptul în caz de eroare.
 
 ---
 
-## Descriere 
-### Task 1 — Cezar simplu
-- Criptare: `c = (x + k) mod 26`
-- Decriptare: `m = (y - k + 26) mod 26`
-- `x`, `y` sunt indecșii 0..25 obținuți din alfabetul definit de proiect.
+### 4. Cifrul Cezar cu permutare (Task 2)
 
-### Task 2 — Cezar + permutare
-1. **Generează alfabetul permutat** din `k2`:
-    - Adaugă literele din `k2` (fără duplicate) → apoi restul literelor A..Z în ordine naturală (fără duplicare).
-2. **Aplică** deplasarea Caesar (cu `k`) **peste alfabetul permutat**.
-3. Criptare/decriptare funcționează analog Task 1, dar **indexarea** se face în **alfabetul permutat**.
+Această versiune adaugă o cheie secundară `k2` (un cuvânt-cheie format doar din litere).  
+Scopul este să genereze un **alfabet personalizat**, după următorul algoritm:
+
+#### a) Generarea alfabetului nou (`newAlphabet.java`)
+1. Se preiau literele din `k2`, se transformă în majuscule.
+2. Se elimină duplicatele păstrând ordinea apariției.
+3. Se adaugă restul literelor alfabetului `A–Z` care nu apar în `k2`.
+4. Rezultatul este un nou vector `ABC2` cu 26 caractere unice.
+
+Exemplu:
+```
+k2 = TEST
+Alfabet nou = T E S A B C D F G H I J K L M N O P Q R U V W X Y Z
+```
+
+#### b) Aplicarea cifrului Cezar
+După generarea alfabetului permutat, criptarea și decriptarea funcționează identic cu Task 1,  
+doar că în locul alfabetului `ABC` se folosește `ABC2`.
+
+Exemplu:
+```
+Text: NEW
+k1 = 3
+k2 = TEST
+Rezultat criptare: QBZ
+Rezultat decriptare: NEW
+```
 
 ---
 
+### 5. Fluxul principal (`Main.java`)
+Clasa `Main` acționează ca un meniu principal:
+- Afișează opțiunile disponibile („Sarcina 1.1” și „Sarcina 1.2”).
+- Direcționează execuția către metoda `task1.main()` sau `task2.main()`.
+- Asigură controlul centralizat al rulării programului.
 
+---
 
-## Rezultate
+### 6. Exemple de rulare
+
+#### Criptare simplă:
 ```
 Selecteaza unul dintre urmatoarele taskuri:
-
 1. Sarcina 1.1
 2. Sarcina 1.2
 1
 Introdu cheia pentru Cryptare/Decryptare: 3
-
 Algoritmul Cesar. Selectează una dintre opțiuni:
 1. Criptare
 2. Decriptare
@@ -89,30 +121,18 @@ Introdu textul care trebuie criptat: NEW
 QHZ
 ```
 
+#### Decriptare:
 ```
-Selecteaza unul dintre urmatoarele taskuri:
-
-1. Sarcina 1.1
-2. Sarcina 1.2
-1
-Introdu cheia pentru Cryptare/Decryptare: 3
-
-Algoritmul Cesar. Selectează una dintre opțiuni:
-1. Criptare
-2. Decriptare
-2
 Introdu textul care trebuie decriptat: QHZ
 NEW
-
 ```
 
+#### Cezar cu permutare:
 ```
 Selecteaza unul dintre urmatoarele taskuri:
-
 1. Sarcina 1.1
 2. Sarcina 1.2
 2
-
 Criptarea algoritmului cesar utilizand doua chei.
 Introdu prima cheie: 3
 Introdu a doua cheie: TEST
@@ -122,9 +142,18 @@ QBZ
 
 ---
 
+### 7. Concluzii
 
-## Autor
+Implementarea demonstrează funcționarea corectă a:
+- **cifrului Cezar clasic** și
+- **versiunii extinse cu permutare**.
+
+Prin utilizarea propriei mapări alfabetice și a validărilor stricte, programul respectă cerințele teoretice ale laboratorului.  
+Extensia cu permutare crește spațiul de chei posibile și reduce vulnerabilitatea la atacul exhaustiv, dar rămâne sensibil la analiza frecvenței.
+
+---
+
 **Student:** Bujor Alexandru  
-**Grupa:** FAF-231
+**Grupa:** FAF-231  
 **Disciplina:** Criptografie și Securitate Informațională  
 **Lucrarea:** Nr. 1 — Cifrul lui Cezar
