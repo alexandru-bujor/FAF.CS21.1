@@ -10,14 +10,14 @@ public class encrypt2 {
     static int k;
 
 
-    public static void main(String[] args) {
+    public static void main() {
         Scanner sc = new Scanner(System.in);
 
-        System.out.print("Give me the first key: ");
+        System.out.print("Introdu prima cheie: ");
         k = sc.nextInt(); sc.nextLine();
-        System.out.print("Give me the second key: ");
+        System.out.print("Introdu a doua cheie: ");
         k2 = sc.nextLine();
-        System.out.print("Give me the text to encrypt: ");
+        System.out.print("Textul care trebuie criptat: ");
         ch = sc.nextLine();
         Encrypt.encrypt(ch, k, newAlphabet.newABC(k2));
 

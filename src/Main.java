@@ -6,9 +6,6 @@ void main() {
 
     Scanner sc = new Scanner(System.in);
 
-
-
-
     System.out.println("Selecteaza unul dintre urmatoarele taskuri:\n");
     System.out.println("1. Sarcina 1.1");
     System.out.println("2. Sarcina 1.2");

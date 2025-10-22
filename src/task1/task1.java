@@ -2,7 +2,7 @@ package task1;
 import java.util.Scanner;
 
 public class task1 {
-    public static void main(String[] args) {
+    public static void main() {
         Scanner sc = new Scanner(System.in);
 
         System.out.print("Introdu cheia pentru Cryptare/Decryptare: ");
