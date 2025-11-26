@@ -1,125 +1,81 @@
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
 
-    // Alfabetul românesc de 31 litere (toate majuscule)
-    private static final String ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZĂÂÎȘȚ";
+    // Tabelul de permutare initiala (IP)
+    private static final int[] IP = {
+            58, 50, 42, 34, 26, 18, 10, 2,
+            60, 52, 44, 36, 28, 20, 12, 4,
+            62, 54, 46, 38, 30, 22, 14, 6,
+            64, 56, 48, 40, 32, 24, 16, 8,
+            57, 49, 41, 33, 25, 17,  9, 1,
+            59, 51, 43, 35, 27, 19, 11, 3,
+            61, 53, 45, 37, 29, 21, 13, 5,
+            63, 55, 47, 39, 31, 23, 15, 7
+    };
 
-    // Mapare literă -> index și index -> literă
-    private static final Map<Character, Integer> charToIndex = new HashMap<>();
-    private static final Map<Integer, Character> indexToChar = new HashMap<>();
-
-    static {
-        for (int i = 0; i < ALPHABET.length(); i++) {
-            char c = ALPHABET.charAt(i);
-            charToIndex.put(c, i);
-            indexToChar.put(i, c);
-        }
+    // Transformă un caracter în binar pe 8 biți
+    private static String toBinary8(char c) {
+        return String.format("%8s", Integer.toBinaryString(c)).replace(' ', '0');
     }
 
-    // Verifică dacă textul conține doar litere permise
-    private static boolean isValid(String text) {
-        for (char c : text.toCharArray()) {
-            if (!charToIndex.containsKey(c)) {
-                return false;
-            }
+    // Aplică permutarea IP șirului de 64 biți
+    private static String applyIP(String bits64) {
+        StringBuilder out = new StringBuilder();
+        for (int index : IP) {
+            out.append(bits64.charAt(index - 1));
         }
-        return true;
-    }
-
-    // Scoate spațiile și transformă în majuscule
-    private static String preprocess(String text) {
-        return text.replaceAll("\\s+", "").toUpperCase();
-    }
-
-    // Criptare Vigenere
-    private static String encrypt(String message, String key) {
-        StringBuilder result = new StringBuilder();
-        int mLen = message.length();
-        int kLen = key.length();
-
-        for (int i = 0; i < mLen; i++) {
-            int mIndex = charToIndex.get(message.charAt(i));
-            int kIndex = charToIndex.get(key.charAt(i % kLen));
-            int cIndex = (mIndex + kIndex) % 31;
-            result.append(indexToChar.get(cIndex));
-        }
-        return result.toString();
-    }
-
-    // Decriptare Vigenere
-    private static String decrypt(String cipher, String key) {
-        StringBuilder result = new StringBuilder();
-        int cLen = cipher.length();
-        int kLen = key.length();
-
-        for (int i = 0; i < cLen; i++) {
-            int cIndex = charToIndex.get(cipher.charAt(i));
-            int kIndex = charToIndex.get(key.charAt(i % kLen));
-            int mIndex = (cIndex - kIndex + 31) % 31;
-            result.append(indexToChar.get(mIndex));
-        }
-        return result.toString();
+        return out.toString();
     }
 
     public static void main(String[] args) {
+
         Scanner sc = new Scanner(System.in);
 
-        System.out.println("Cifrul Vigenere (alfabet romanesc, 31 litere)");
-        System.out.println("1 - Criptare");
-        System.out.println("2 - Decriptare");
-        System.out.print("Alege optiunea: ");
-        int op = sc.nextInt();
-        sc.nextLine(); // consumă \n
+        System.out.println("=== DES – Calcularea lui L1 ===");
+        System.out.println("Introdu un mesaj de EXACT 8 caractere:");
 
-        if (op != 1 && op != 2) {
-            System.out.println("Eroare: trebuie 1 sau 2.");
+        String msg = sc.nextLine();
+        if (msg.length() != 8) {
+            System.out.println("Eroare: mesajul trebuie sa contina exact 8 caractere.");
             return;
         }
 
-        // Citire cheie
-        System.out.print("Introdu cheia (minim 7 caractere): ");
-        String key = preprocess(sc.nextLine());
-
-        if (key.length() < 7) {
-            System.out.println("Eroare: cheia este prea scurta (minim 7).");
-            return;
-        }
-        if (!isValid(key)) {
-            System.out.println("Eroare: cheia poate contine doar litere A–Z, Ă, Â, Î, Ș, Ț.");
-            return;
+        // 1. Convertirea mesajului în 64 biți
+        StringBuilder bits64 = new StringBuilder();
+        for (char c : msg.toCharArray()) {
+            bits64.append(toBinary8(c));
         }
 
-        if (op == 1) {
-            // Criptare
-            System.out.print("Introdu mesajul: ");
-            String msg = preprocess(sc.nextLine());
+        System.out.println("\nMesajul in binar (64 biti):");
+        System.out.println(bits64);
 
-            if (!isValid(msg)) {
-                System.out.println("Eroare: mesajul poate contine doar litere A–Z, Ă, Â, Î, Ș, Ț.");
-                return;
-            }
-
-            String cipher = encrypt(msg, key);
-            System.out.println("Criptograma:");
-            System.out.println(cipher);
-
-        } else {
-            // Decriptare
-            System.out.print("Introdu criptograma: ");
-            String cipher = preprocess(sc.nextLine());
-
-            if (!isValid(cipher)) {
-                System.out.println("Eroare: criptograma poate contine doar litere A–Z, Ă, Â, Î, Ș, Ț.");
-                return;
-            }
-
-            String message = decrypt(cipher, key);
-            System.out.println("Mesaj decriptat (fara spatii):");
-            System.out.println(message);
-            System.out.println("Spatiile se adauga manual.");
+        // 2. Afișăm tabelul IP
+        System.out.println("\nTabelul IP (Initial Permutation):");
+        for (int i = 0; i < IP.length; i++) {
+            System.out.printf("%2d ", IP[i]);
+            if ((i + 1) % 8 == 0) System.out.println();
         }
+
+        // 3. Aplic IP
+        String afterIP = applyIP(bits64.toString());
+
+        System.out.println("\nDupa aplicarea IP (64 biti):");
+        System.out.println(afterIP);
+
+        // 4. L0 si R0
+        String L0 = afterIP.substring(0, 32);
+        String R0 = afterIP.substring(32);
+
+        System.out.println("\nL0 (primii 32 biti):");
+        System.out.println(L0);
+
+        System.out.println("\nR0 (ultimii 32 biti):");
+        System.out.println(R0);
+
+        // 5. L1 = R0
+        System.out.println("\n=== REZULTAT ===");
+        System.out.println("L1 = R0 = ");
+        System.out.println(R0);
     }
 }
